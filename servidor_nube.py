@@ -14,9 +14,6 @@ def convertir_video():
     if not video_url:
         return jsonify({"error": "Falta la URL del video"}), 400
 
-    # Buscamos el archivo cookies.txt en la raiz del servidor
-    cookies_path = os.path.join(os.getcwd(), 'cookies.txt')
-
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(OUTPUT_DIR, '%(id)s.%(ext)s'),
@@ -27,11 +24,13 @@ def convertir_video():
         }],
         'quiet': True,
         'no_warnings': True,
+        # Forzamos los clientes nativos de las apps móviles y TV que saltean las IPs de datacenter
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'tvhtml5'],
+            }
+        }
     }
-
-    # Si el archivo existe, se lo inyectamos de prepo a yt-dlp
-    if os.path.exists(cookies_path):
-        ydl_opts['cookiefile'] = cookies_path
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -47,7 +46,7 @@ def convertir_video():
                     download_name=f"{info.get('title', 'audio')}.mp3"
                 )
             else:
-                return jsonify({"error": "No se pudo generar el archivo MP3"}), 500
+                return jsonify({"error": "El archivo MP3 no se genero"}), 500
 
     except Exception as e:
         error_msg = str(e).split('\n')[0]
