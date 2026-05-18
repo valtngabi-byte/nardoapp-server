@@ -1,3 +1,3 @@
 # Netscape HTTP Cookie File
-.youtube.comTRUE/TRUE0VISITOR_INFO1_LIVEtU_Y8vXzU_g
-.youtube.comTRUE/TRUE0LOGIN_INFOAFmmF2swRQIhAO_X8:Zg_821ks92
+.youtube.com	TRUE	/	TRUE	0	VISITOR_INFO1_LIVE	tU_Y8vXzU_g
+.youtube.com	TRUE	/	TRUE	0	LOGIN_INFO	AFmmF2swRQIhAO_X8:Zg_821ks92
