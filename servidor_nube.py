@@ -4,7 +4,6 @@ from flask import Flask, request, jsonify, send_file
 
 app = Flask(__name__)
 
-# Carpeta temporal dentro del servidor en la nube para procesar el audio
 OUTPUT_DIR = '/tmp/downloads'
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
@@ -15,7 +14,6 @@ def convertir_video():
     if not video_url:
         return jsonify({"error": "Falta la URL del video"}), 400
 
-    # Configuración de yt-dlp optimizada para saltear bloqueos en la nube
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(OUTPUT_DIR, '%(id)s.%(ext)s'),
@@ -26,28 +24,21 @@ def convertir_video():
         }],
         'quiet': True,
         'no_warnings': True,
-        'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-us,en;q=0.5',
-        },
+        # Forzamos a usar clientes que evaden el bloqueo de bot en servidores en la nube
         'extractor_args': {
             'youtube': {
-                'player_client': ['android'],
+                'player_client': ['ios', 'tvhtml5']
             }
         }
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            # Extraemos la información para saber el ID del video
             info = ydl.extract_info(video_url, download=True)
             video_id = info['id']
-            # Ruta del archivo MP3 generado en el servidor
             archivo_mp3 = os.path.join(OUTPUT_DIR, f"{video_id}.mp3")
 
             if os.path.exists(archivo_mp3):
-                # Enviamos el archivo final directo al teléfono de quien lo pidió
                 return send_file(
                     archivo_mp3,
                     mimetype='audio/mpeg',
