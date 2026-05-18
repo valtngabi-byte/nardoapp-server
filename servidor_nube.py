@@ -15,7 +15,7 @@ def convertir_video():
     if not video_url:
         return jsonify({"error": "Falta la URL del video"}), 400
 
-    # Configuración de yt-dlp optimizada para la nube
+    # Configuración de yt-dlp optimizada para saltear bloqueos en la nube
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(OUTPUT_DIR, '%(id)s.%(ext)s'),
@@ -25,7 +25,17 @@ def convertir_video():
             'preferredquality': '320',
         }],
         'quiet': True,
-        'no_warnings': True
+        'no_warnings': True,
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-us,en;q=0.5',
+        },
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android'],
+            }
+        }
     }
 
     try:
@@ -51,6 +61,5 @@ def convertir_video():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Render u otras nubes te asignan el puerto automáticamente mediante una variable de entorno
     puerto = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=puerto)
